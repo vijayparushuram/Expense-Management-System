@@ -279,14 +279,6 @@ pytest --cov=Backend tests/
 - Check database name and user permissions
 - Verify network/firewall settings
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 👥 Authors
-
-- Your Name - Initial work
-
 ## 🙏 Acknowledgments
 
 - FastAPI documentation
