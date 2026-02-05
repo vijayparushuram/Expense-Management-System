@@ -1,20 +1,22 @@
 import mysql.connector
 from contextlib import contextmanager
 from logging_setup import setup_logger
+import os
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 
 logger = setup_logger('db_helper')
-
-
 
 
 @contextmanager
 def get_db_cursor(commit=False):
     connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="pgk97@MKVP",
-        database="expense_manager"
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
 
     cursor = connection.cursor(dictionary=True)
@@ -46,14 +48,14 @@ def insert_expense(expense_date, amount, category, notes):
             (expense_date, amount, category, notes)
         )
 
-def fetch_expense_summary(start_date, end_date):  # Added colon
+def fetch_expense_summary(start_date, end_date):
     logger.info(f"fetch_expense_summary called with {start_date} end: {end_date}")
-    with get_db_cursor() as cursor:  # Added parentheses ()
+    with get_db_cursor() as cursor:
         cursor.execute(
             '''SELECT category, SUM(amount) as total
                FROM expenses WHERE expense_date
                BETWEEN %s AND %s
-               GROUP BY category''',  # Added comma, removed semicolon
+               GROUP BY category''',
             (start_date, end_date)
         )
         data = cursor.fetchall()
@@ -61,11 +63,10 @@ def fetch_expense_summary(start_date, end_date):  # Added colon
 
 
 if __name__ == "__main__":
-
     expenses = fetch_expenses_for_date("2024-09-30")
     print(expenses)
     insert_expense("2024-08-25", 40, "Food", "Eat tasty samossa chat")
     #delete_expenses_for_date("2024-08-25")
-    summary = fetch_expense_summary("2024-08-01", "2024-08-05")  # Fixed function name
+    summary = fetch_expense_summary("2024-08-01", "2024-08-05")
     for record in summary:
         print(record)
